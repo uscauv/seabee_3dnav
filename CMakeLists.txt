@@ -9,7 +9,9 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
   std_msgs
   geometry_msgs
+  tf
   nav_msgs
+  sensor_msgs
   genmsg
   actionlib_msgs
   actionlib

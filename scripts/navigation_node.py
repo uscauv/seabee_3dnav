@@ -11,6 +11,25 @@ import sensor_msgs.msg
 from seabee_3dnav.msg import *
 
 
+class NavigationNode(object):
+
+    def initialize(self):
+        self.last_odom_msg = None
+        self.last_imu_msg = None
+        self.pub = rospy.Publisher("cmd_vel", geometry_msgs.msg.Twist, queue_size=50)
+        self.odom = rospy.Subscriber("odom", nav_msgs.msg.Odometry, self.odom_callback)
+        self.imu = rospy.Subscriber("imu/data", sensor_msgs.msg.Imu, self.imu_callback)
+        self.location_server = SeabeeGoToLocationServer(self)
+        self.orientation_server = SeabeeGoToOrientationServer(self)
+        rospy.spin()
+
+    def odom_callback(self, msg):
+        self.last_odom_msg = msg
+
+    def imu_callback(self, msg):
+        self.last_imu_msg = msg
+
+
 class SeabeeGoToLocationServer:
 
     def __init__(self, nav_node):
@@ -106,25 +125,6 @@ class SeabeeGoToOrientationServer:
         new_msg.linear.y = 0
         new_msg.linear.z = 0
         self.nav_node.pub.publish(new_msg)
-
-
-class NavigationNode(object):
-
-    def initialize(self):
-        self.last_odom_msg = None
-        self.last_imu_msg = None
-        self.pub = rospy.Publisher("cmd_vel", geometry_msgs.msg.Twist, queue_size=50)
-        self.odom = rospy.Subscriber("odom", nav_msgs.msg.Odometry, self.odom_callback)
-        self.imu = rospy.Subscriber("imu/data", sensor_msgs.msg.Imu, self.imu_callback)
-        self.location_server = SeabeeGoToLocationServer(self)
-        self.orientation_server = SeabeeGoToOrientationServer(self)
-        rospy.spin()
-
-    def odom_callback(self, msg):
-        self.last_odom_msg = msg
-
-    def imu_callback(self, msg):
-        self.last_imu_msg = msg
 
 
 if __name__ == "__main__":
